@@ -25,6 +25,19 @@ const StartupCard = ({ post }: { post: StartupCardTypw }) => {
           <Image src="https://placehold.co/48x48" alt="placeholder" width={48} height={48} className="rounded-full" />
         </Link>
       </div>
+      <Link href={`/startup/${_id}`}>
+        <p className="startup-card_desc">{description}</p>
+      <img src={image} alt={title} className="startup-card_img" />
+
+      </Link>
+      <div className="flex-between gap-5 mt-4">
+        <Link href={`/?query=${category}`}>
+        <p className="text-16-medium">{category}</p>
+        </Link>
+        <Link href={`/startup/${_id}`}>
+        <p className="startup-card_btn">Details</p>
+        </Link>
+      </div>
     </li>
   );
 };
