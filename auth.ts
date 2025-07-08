@@ -18,20 +18,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks:{
     async signIn({user,account,profile}){
-      const existingUser = await client.fetch(AUTHOR_BY_GOOGLE_ID_QUERY,{id:user.id})
+      // Use profile.sub as the Google ID (this is the standard OAuth field)
+      const googleId = profile?.sub || user.id;
+      
+      const existingUser = await client.withConfig({useCdn:false}).fetch(AUTHOR_BY_GOOGLE_ID_QUERY,{id: googleId})
       
       if(!existingUser){
         await writeClient.create({
           _type:"author",
-          _id:user.id,
-          name:profile?.name,
-          username:profile?.name,
-          email:user.email,
-          image:profile?.image,
-          bio:profile?.bio || "",
+          _id:googleId,
+          id: googleId, // Store Google ID as string
+          name: user.name,
+          username: user.name?.toLowerCase().replace(/\s+/g, '_') || `user_${googleId}`, // Generate unique username
+          email: user.email,
+          image: user.image,
+          bio: "", // Google doesn't provide bio
         })
       }
       return true 
+    },
+    async jwt({token,account,profile}){  
+      if(account && profile){
+        const googleId = profile?.sub || token.sub;
+        const user = await client.withConfig({useCdn:false}).fetch(AUTHOR_BY_GOOGLE_ID_QUERY,{id: googleId})
+        if(user) {
+          token.id = user.id
+        }
+      }
+      return token
+    },
+    async session({session,token}){
+      Object.assign(session, {id:token.id})
+      return session
     }
-  }
+  },
+  
 });

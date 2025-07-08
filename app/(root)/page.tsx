@@ -3,6 +3,7 @@ import SearchForm from "../../components/SearchForm";
 import StartupCard from "../../components/StartupCard";
 import { STARTUPS_QUERY } from "@/sanity/lib/queries";
 import { SanityLive, sanityFetch } from "@/sanity/lib/live";
+import { auth } from "@/auth";
 // import Image from "next/image";
 export default async function Home({
   searchParams,
