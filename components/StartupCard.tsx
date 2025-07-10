@@ -3,8 +3,9 @@ import { formatDate } from "@/lib/utils";
 import { EyeIcon } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Skeleton } from "./ui/skeleton";
 const StartupCard = ({ post }: { post: StartupCardTypw }) => {
-  const { _createdAt, views, title, description, image, author: {name,_id:authorId}, category, _id } =post;
+  const { _createdAt, views, title, description, image, author: {name,_id:authorId,image:authorImage}, category, _id } =post;
   return (
     <li className="startup-card group">
       <div className="flex-between">
@@ -22,7 +23,7 @@ const StartupCard = ({ post }: { post: StartupCardTypw }) => {
           <p className="text-26-semibold line-clamp-1">{title}</p></Link>
         </div>
         <Link href={`/user/${authorId}`}>
-          <Image src="https://placehold.co/48x48" alt="placeholder" width={48} height={48} className="rounded-full" />
+          <Image src={authorImage} alt={name} width={48} height={48} className="rounded-full" />
         </Link>
       </div>
       <Link href={`/startup/${_id}`}>
@@ -41,5 +42,15 @@ const StartupCard = ({ post }: { post: StartupCardTypw }) => {
     </li>
   );
 };
-
+export const StartupCardSkeleton = () => {
+  return(
+    <>
+    {[...Array(5)].map((_,index)=>(
+      <li key={index} className="startup-card group">
+        <Skeleton className="startup-card_skeleton" />
+      </li>
+    ))}
+    </>
+  )
+}
 export default StartupCard;

@@ -9,11 +9,18 @@ import markdownit from 'markdown-it'
 import { Suspense } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import View from "@/components/View"
+import { PLAYLISTS_BY_SLUG_QUERY } from "@/sanity/lib/queries"
+import StartupCard from "@/components/StartupCard"
+import { log } from "console"
 const md = markdownit()
 export default async function page({params}:{params:Promise<{id:string}>}) {
 
     const {id} = await params
-    const post = await client.fetch(STARTUP_BY_ID_QUERY,{id})
+    const [post,{startups:editorPicks}] = await Promise.all([
+        client.fetch(STARTUP_BY_ID_QUERY,{id}),
+        client.fetch(PLAYLISTS_BY_SLUG_QUERY,{slug: 'editor-picks-new'})
+    ])
+
     
     if(!post) return notFound()
      const parsedContent = md.render(post?.pitch || "")    
@@ -48,7 +55,18 @@ export default async function page({params}:{params:Promise<{id:string}>}) {
         )}
     </div>
     <hr className="divider" />
-    {/* EDITOR SELECTED STARTUPS */}
+    {editorPicks?.length>0 &&  (
+        <div className="max-w-4xl mx-auto">
+             <p className="text-30-semibold">Editor Picks</p>
+             <ul className="mt-7 card_grid-sm">
+                {editorPicks.map((startup:any)=>(
+                    <li key={startup._id}>
+                        <StartupCard post={startup} />
+                    </li>
+                ))}
+             </ul>
+        </div>
+    )}
     <Suspense fallback={<Skeleton className="view_skeleton"/>}>
         <View id={id} />
     </Suspense>
