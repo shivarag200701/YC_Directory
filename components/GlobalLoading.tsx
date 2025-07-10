@@ -8,32 +8,15 @@ export default function GlobalLoading() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Show loading immediately when pathname changes
-    setIsLoading(true);
-    
-    // Hide loading after a short delay to ensure content is ready
-    const timer = setTimeout(() => setIsLoading(false), 100);
-    return () => clearTimeout(timer);
-  }, [pathname]);
-
-  // Listen for link clicks
-  useEffect(() => {
-    const handleLinkClick = () => {
+    // Only show loading if pathname actually changes
+    if (pathname) {
       setIsLoading(true);
-    };
-
-    // Add click listeners to all links
-    const links = document.querySelectorAll('a[href]');
-    links.forEach(link => {
-      link.addEventListener('click', handleLinkClick);
-    });
-
-    return () => {
-      links.forEach(link => {
-        link.removeEventListener('click', handleLinkClick);
-      });
-    };
-  }, []);
+      
+      // Hide loading after a short delay
+      const timer = setTimeout(() => setIsLoading(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pathname]);
 
   if (!isLoading) return null;
 
